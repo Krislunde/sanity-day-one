@@ -143,6 +143,6 @@ export default async function EventPage({
                     )}
                 </div>
             </div>
-        </main >
+        </main>
     );
 }
