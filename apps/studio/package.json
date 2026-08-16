@@ -11,6 +11,7 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "typecheck": "tsc --noEmit",
+    "typegen": "sanity schema extract --force && sanity typegen generate",
     "lint": "eslint ."
   },
   "keywords": [
