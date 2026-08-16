@@ -44,7 +44,8 @@ export type Event = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  eventType?: string;
+  eventType?: "in-person" | "virtual";
+  format?: "in-person" | "virtual";
   date?: string;
   doorsOpen?: number;
   venue?: VenueReference;
@@ -75,6 +76,7 @@ export type Event = {
     _key: string;
   }>;
   tickets?: string;
+  firstPublished?: string;
 };
 
 export type SanityImageCrop = {
@@ -224,11 +226,28 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = VenueReference | ArtistReference | SanityImageAssetReference | Event | SanityImageCrop | SanityImageHotspot | Artist | Venue | Slug | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes =
+  | VenueReference
+  | ArtistReference
+  | SanityImageAssetReference
+  | Event
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Artist
+  | Venue
+  | Slug
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
 
 // Source: ../web/src/app/events/[slug]/page.tsx
 // Variable: EVENT_QUERY
-// Query: *[    _type == "event" &&    slug.current == $slug  ][0]{  ...,  "date": coalesce(date, now()),  "doorsOpen": coalesce(doorsOpen, 0),  headline->,  venue->}
+// Query: *[    _type == "event" &&    slug.current == $slug][0]    {        ...,        "eventType": coalesce(format, eventType),        "date": coalesce(date, now()),        "doorsOpen": coalesce(doorsOpen, 0),        headline->,        venue->    }
 export type EVENT_QUERY_RESULT = {
   _id: string;
   _type: "event";
@@ -237,7 +256,8 @@ export type EVENT_QUERY_RESULT = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  eventType?: string;
+  eventType: "in-person" | "virtual" | null;
+  format?: "in-person" | "virtual";
   date: string;
   doorsOpen: number | 0;
   venue: {
@@ -292,6 +312,7 @@ export type EVENT_QUERY_RESULT = {
     _key: string;
   }>;
   tickets?: string;
+  firstPublished?: string;
 } | null;
 
 // Source: ../web/src/app/page.tsx
@@ -304,3 +325,11 @@ export type EVENTS_QUERY_RESULT = Array<{
   date: string | null;
 }>;
 
+// Query TypeMap
+import "@sanity/client";
+declare module "@sanity/client" {
+  interface SanityQueries {
+    '*[\n    _type == "event" &&\n    slug.current == $slug][0]\n    {\n        ...,\n        "eventType": coalesce(format, eventType),\n        "date": coalesce(date, now()),\n        "doorsOpen": coalesce(doorsOpen, 0),\n        headline->,\n        venue->\n    }': EVENT_QUERY_RESULT;
+    '*[\n  _type == "event"\n  && defined(slug.current)\n  && date > now()\n]|order(date asc){_id, name, slug, date}': EVENTS_QUERY_RESULT;
+  }
+}
