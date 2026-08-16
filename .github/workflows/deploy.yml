@@ -15,15 +15,18 @@ permissions:
 env:
   SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
-
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+
+    # Keyed by PR number for previews, by branch name for main/development.
+    # A branch deploy can never collide with a PR whose head branch happens to
+    # share that name (e.g. the development -> main promotion PR).
+    concurrency:
+      group: studio-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref_name }}
+      cancel-in-progress: true
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'Production' || github.ref == 'refs/heads/development' && 'Development' || 'Preview' }}
@@ -92,6 +95,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
 
+    # Deliberately the same group as this PR's preview deploy, so closing the PR
+    # cancels an in-flight preview before it can create a hostname nothing would
+    # ever clean up.
+    concurrency:
+      group: studio-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+
     environment:
       name: Preview
 
@@ -107,7 +117,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Best-effort: a PR closed before its preview ever deployed has no
+      # hostname to remove, and that should not fail the run.
       - name: Cleanup PR preview
+        continue-on-error: true
         run: pnpm --filter ./apps/studio exec sanity undeploy --yes
         env:
           SANITY_STUDIO_HOSTNAME: ${{ vars.SANITY_STUDIO_BASE_HOSTNAME }}-pr-${{ github.event.pull_request.number }}
