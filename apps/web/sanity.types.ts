@@ -44,7 +44,8 @@ export type Event = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  eventType?: string;
+  eventType?: "in-person" | "virtual";
+  format?: "in-person" | "virtual";
   date?: string;
   doorsOpen?: number;
   venue?: VenueReference;
@@ -75,6 +76,7 @@ export type Event = {
     _key: string;
   }>;
   tickets?: string;
+  firstPublished?: string;
 };
 
 export type SanityImageCrop = {
@@ -228,7 +230,7 @@ export type AllSanitySchemaTypes = VenueReference | ArtistReference | SanityImag
 
 // Source: ../web/src/app/events/[slug]/page.tsx
 // Variable: EVENT_QUERY
-// Query: *[    _type == "event" &&    slug.current == $slug  ][0]{  ...,  "date": coalesce(date, now()),  "doorsOpen": coalesce(doorsOpen, 0),  headline->,  venue->}
+// Query: *[    _type == "event" &&    slug.current == $slug][0]    {        ...,        "eventType": coalesce(format, eventType),        "date": coalesce(date, now()),        "doorsOpen": coalesce(doorsOpen, 0),        headline->,        venue->    }
 export type EVENT_QUERY_RESULT = {
   _id: string;
   _type: "event";
@@ -237,7 +239,8 @@ export type EVENT_QUERY_RESULT = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  eventType?: string;
+  eventType: "in-person" | "virtual" | null;
+  format?: "in-person" | "virtual";
   date: string;
   doorsOpen: number | 0;
   venue: {
@@ -292,6 +295,7 @@ export type EVENT_QUERY_RESULT = {
     _key: string;
   }>;
   tickets?: string;
+  firstPublished?: string;
 } | null;
 
 // Source: ../web/src/app/page.tsx
