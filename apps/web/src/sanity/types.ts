@@ -247,7 +247,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../web/src/app/events/[slug]/page.tsx
 // Variable: EVENT_QUERY
-// Query: *[    _type == "event" &&    slug.current == $slug][0]    {        ...,        "eventType": coalesce(format, eventType),        "date": coalesce(date, now()),        "doorsOpen": coalesce(doorsOpen, 0),        headline->,        venue->    }
+// Query: *[    _type == "event" &&    slug.current == $slug][0]    {        ...,        "date": coalesce(date, now()),        "doorsOpen": coalesce(doorsOpen, 0),        headline->,        venue->    }
 export type EVENT_QUERY_RESULT = {
   _id: string;
   _type: "event";
@@ -256,7 +256,7 @@ export type EVENT_QUERY_RESULT = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  eventType: "in-person" | "virtual" | null;
+  eventType?: "in-person" | "virtual";
   format?: "in-person" | "virtual";
   date: string;
   doorsOpen: number | 0;
@@ -329,7 +329,7 @@ export type EVENTS_QUERY_RESULT = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[\n    _type == "event" &&\n    slug.current == $slug][0]\n    {\n        ...,\n        "eventType": coalesce(format, eventType),\n        "date": coalesce(date, now()),\n        "doorsOpen": coalesce(doorsOpen, 0),\n        headline->,\n        venue->\n    }': EVENT_QUERY_RESULT;
+    '*[\n    _type == "event" &&\n    slug.current == $slug][0]\n    {\n        ...,\n        "date": coalesce(date, now()),\n        "doorsOpen": coalesce(doorsOpen, 0),\n        headline->,\n        venue->\n    }': EVENT_QUERY_RESULT;
     '*[\n  _type == "event"\n  && defined(slug.current)\n  && date > now()\n]|order(date asc){_id, name, slug, date}': EVENTS_QUERY_RESULT;
   }
 }
