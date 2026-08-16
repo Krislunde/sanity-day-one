@@ -8,14 +8,15 @@ import { urlFor } from "@/sanity/image";
 
 const EVENT_QUERY = defineQuery(`*[
     _type == "event" &&
-    slug.current == $slug
-  ][0]{
-  ...,
-  "date": coalesce(date, now()),
-  "doorsOpen": coalesce(doorsOpen, 0),
-  headline->,
-  venue->
-}`);
+    slug.current == $slug][0]
+    {
+        ...,
+        "eventType": coalesce(format, eventType),
+        "date": coalesce(date, now()),
+        "doorsOpen": coalesce(doorsOpen, 0),
+        headline->,
+        venue->
+    }`);
 
 export default async function EventPage({
     params,
@@ -72,6 +73,7 @@ export default async function EventPage({
                     className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
                     height="310"
                     width="550"
+                    loading="eager"
                 />
                 <div className="flex flex-col justify-center space-y-4">
                     <div className="space-y-4">
@@ -141,6 +143,6 @@ export default async function EventPage({
                     )}
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
