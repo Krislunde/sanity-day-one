@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Machine-local Claude Code settings
+.claude/settings.local.json
+
 # Archives / build output
 *.tar.gz
 
