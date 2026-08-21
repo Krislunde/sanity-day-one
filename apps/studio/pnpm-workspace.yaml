@@ -6,5 +6,5 @@ minimumReleaseAgeExclude:
   - '@sanity/schema@6.9.2'
   - '@sanity/types@6.9.2'
   - '@sanity/util@6.9.2'
-  - '@sanity/vision@6.9.2'
-  - sanity@6.9.2
+  - '@sanity/vision@6.10.1'
+  - sanity@6.10.1
